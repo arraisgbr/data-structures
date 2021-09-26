@@ -12,10 +12,54 @@ public class ABPerms {
         StdOut.println();
     }
 
-    // Find the increasing permutations
-    public static void enumerateS(char[] answer, int size){
-        // if the substring already has the maximun increasing sequence
+    // Longest Increasing Subsequence
+    public static int LIS(char[] answer){
+        // Creating an array of subproblems
+        int size = answer.length;
+        int[] lis = new int[size];
+        for(int i = 0 ; i < size ; i++) lis[i] = 1;
 
+        // LIS
+        int j = 1;
+        while(j < size){
+            for(int i = 0 ; i < j ; i++){
+                if(answer[j] > answer[i]) lis[j] = Math.max(lis[j], lis[i] + 1);
+            }
+            j++;
+        }
+
+        int max = 0;
+        for(int i = 0 ; i < size ; i++) max = Math.max(max, lis[i]);
+
+        return max;
+    }
+
+    // Longest Decreasing Subsequence
+    public static int LDS(char[] answer){
+        // Creating an array of subproblems
+        int size = answer.length;
+        int[] lds = new int[size];
+        for(int i = 0 ; i < size ; i++) lds[i] = 1;
+
+        // LDS
+        int j = 1;
+        while(j < size){
+            for(int i = 0 ; i < j ; i++){
+                if(answer[j] < answer[i]) lds[j] = Math.max(lds[j], lds[i] + 1);
+            }
+            j++;
+        }
+
+        int max = 0;
+        for(int i = 0 ; i < size ; i++) max = Math.max(max, lds[i]);
+
+        return max;
+    }
+    
+    // Find the permutations
+    public static void enumerate(char[] answer, int size){
+
+        // If the permutation has the correct size show it
         if(size == ABPerms.N){
             total++;
             if(verbose) show(answer);
@@ -24,41 +68,19 @@ public class ABPerms {
 
         for(int i = size ; i < ABPerms.N ; i++){
             swap(answer, size, i);
-            enumerateS(answer, size + 1);
+            enumerate(answer, size + 1);
             swap(answer, size, i);
         }
     }
 
+    // Swap two elements of an array
     private static void swap(char[] answer, int i, int j){
         char c = answer[i]; 
         answer[i] = answer[j];  
         answer[j] = c;   
     }
 
-    // Find the decreasing permutations
-    /*
-    public static void enumerateF(char[] answer, int size, int limS, int limF){
-        
-        // if the substring already has the maximun decreasing sequence
-        if(limF == ABPerms.b && size < ABPerms.N) return false;
-        
-        if(size == ABPerms.N){
-            total++;
-            if(verbose) show(answer);
-            return true;
-        }
-
-        for(int i = ABPerms.N - 1 ; i > size ; i--){
-            swap(answer, size, i);
-            if(!enumerateF(answer, size + 1, limS, limF + 1)) return false;
-            swap(answer, size, i);
-        }
-        return false;
-    }
-    */
-
     public static void main(String[] args) {
-        
         // Geting the command line arguments
         ABPerms.N = Integer.parseInt(args[0]);
         ABPerms.a = Integer.parseInt(args[1]);
@@ -74,7 +96,7 @@ public class ABPerms {
         for(int i = 0 ; i < ABPerms.N ; i++) answer[i] = alpha.charAt(i);
         
         // Permutation function
-        enumerateS(answer, 0);
+        enumerate(answer, 0);
 
         // Final print
         if(verbose && args[3].compareTo("-v") < 0 || !verbose) StdOut.println(total);
