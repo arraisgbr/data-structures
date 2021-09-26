@@ -12,52 +12,47 @@ public class ABPerms {
         StdOut.println();
     }
 
-    // Longest Increasing Subsequence
-    public static int LIS(char[] answer){
+    // Longest Increasing Subsequence and Longest Decreasing Subsequence
+    public static void LISandLDS(char[] answer, int size, int[] ls){
+        
         // Creating an array of subproblems
-        int size = answer.length;
         int[] lis = new int[size];
-        for(int i = 0 ; i < size ; i++) lis[i] = 1;
+        int[] lds = new int[size];
+        for(int i = 0 ; i < size ; i++){
+            lis[i] = 1;
+            lds[i] = 1;
+        }
 
-        // LIS
+        // LIS and LDS
         int j = 1;
         while(j < size){
             for(int i = 0 ; i < j ; i++){
                 if(answer[j] > answer[i]) lis[j] = Math.max(lis[j], lis[i] + 1);
-            }
-            j++;
-        }
-
-        int max = 0;
-        for(int i = 0 ; i < size ; i++) max = Math.max(max, lis[i]);
-
-        return max;
-    }
-
-    // Longest Decreasing Subsequence
-    public static int LDS(char[] answer){
-        // Creating an array of subproblems
-        int size = answer.length;
-        int[] lds = new int[size];
-        for(int i = 0 ; i < size ; i++) lds[i] = 1;
-
-        // LDS
-        int j = 1;
-        while(j < size){
-            for(int i = 0 ; i < j ; i++){
                 if(answer[j] < answer[i]) lds[j] = Math.max(lds[j], lds[i] + 1);
             }
             j++;
         }
 
-        int max = 0;
-        for(int i = 0 ; i < size ; i++) max = Math.max(max, lds[i]);
+        int maxLIS = 0;
+        int maxLDS = 0;
+        for(int i = 0 ; i < size ; i++){
+            maxLIS = Math.max(maxLIS, lis[i]);
+            maxLDS = Math.max(maxLDS, lds[i]);
+        }
 
-        return max;
+        ls[0] = maxLIS;
+        ls[1] = maxLDS;
     }
-    
+
     // Find the permutations
     public static void enumerate(char[] answer, int size){
+
+        int[] ls = {0, 0};
+
+        LISandLDS(answer, size, ls);
+
+        // If LIS > a or LDS > b we can't use this permutation
+        if(ls[0] > ABPerms.a || ls[1] > ABPerms.b) return;
 
         // If the permutation has the correct size show it
         if(size == ABPerms.N){
@@ -98,6 +93,11 @@ public class ABPerms {
         // Permutation function
         enumerate(answer, 0);
 
+        // testing
+        //char[] ABPerms = {'b','a','d','c'};
+        //StdOut.println(LIS(ABPerms));
+        //StdOut.println(LDS(ABPerms));
+    
         // Final print
         if(verbose && args[3].compareTo("-v") < 0 || !verbose) StdOut.println(total);
     }
