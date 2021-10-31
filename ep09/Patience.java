@@ -44,21 +44,35 @@ public class Patience{
     }
 
     // print the LIS
-    public static void printStacks(Stack<Node>[] stacks, int realLength){
+    public static Stack<Integer>[] getStacks(Stack<Node>[] stacks, int realLength){
+        Node last = stacks[realLength-1].peek();
 
-        Node last = stacks[realLength-1].pop();
+        Stack<Integer>[] stacksAux = (Stack<Integer>[]) new Stack[2];
+        stacksAux[0] = new Stack<Integer>();
+        stacksAux[1] = new Stack<Integer>();    
 
-        // toDo -> show in increasing order
         StdOut.printf("LIS:\n");
-        while(last.left != null){
-            StdOut.printf("%d: %d / %d\n", --realLength, last.index, last.number);
+        while(last != null){
+            stacksAux[0].push(last.index);
+            stacksAux[1].push(last.number);
             last = last.left;
         }
 
+        return stacksAux;
+    }
+
+    // just print the stacks
+    public static void printStacks(Stack<Node>[] stacks, int realLength){
+        Stack<Integer>[] stacksAux = getStacks(stacks, realLength);
+
+        int count = 0;
+        while(!stacksAux[0].isEmpty()) StdOut.printf("%d: %d / %d\n", count++, stacksAux[0].pop(), stacksAux[1].pop());
     }
 
     // print the LIS and every final stack
     public static void printStacksPlus(Stack<Node>[] stacks, int realLength){
+
+        Stack<Integer>[] stacksAux = getStacks(stacks, realLength);
 
         for(int i = 0 ; i < realLength ; i++){ 
             
@@ -70,27 +84,29 @@ public class Patience{
                 else stacks[i].pop();
             }
 
+            // avoiding loitering
+            stacks[i] = null;
+
             while(!sortedStack.isEmpty()) StdOut.printf("%d ", sortedStack.pop());
             StdOut.println();
         
         }
 
+        StdOut.println("LIS:");
+        int count = 0;
+        while(!stacksAux[0].isEmpty()) StdOut.printf("%d: %d / %d\n", count++, stacksAux[0].pop(), stacksAux[1].pop());
     }
 
     public static void main(String[] args){
-
         // read all entry integers
         int[] seq = StdIn.readAllInts();
 
         // create an array of stacks
         Stack<Node>[] stacks = (Stack<Node>[]) new Stack[seq.length];
-        Stack<Node>[] stacksAux = (Stack<Node>[]) new Stack[seq.length];
 
         for(int i = 0 ; i < seq.length ; i++){
             stacks[i] = new Stack<Node>();
-            stacksAux[i] = new Stack<Node>();
             stacks[i].push(new Node(Integer.MAX_VALUE, -1, null));
-            stacksAux[i].push(new Node(Integer.MAX_VALUE, -1, null));
         }
 
         // iterate over all the integers
@@ -100,8 +116,12 @@ public class Patience{
             int stackNumber = findStack(stacks, seq[i]);
             
             // push the new node on the correct stack
-            Node node = new Node(seq[i], i, stacks[stackNumber].peek());
-            stacksAux[stackNumber].push(node);
+            Node node;
+            if(stackNumber > 0){
+                node = new Node(seq[i], i, stacks[stackNumber-1].peek());
+            }
+            else node = new Node(seq[i], i, null);
+
             stacks[stackNumber].push(node);
         
         }
@@ -111,13 +131,9 @@ public class Patience{
 
         if(args.length != 0){
             if(args[0].equals("+")) printStacks(stacks, ans);
-            else{
-                printStacksPlus(stacks, ans);
-                printStacks(stacksAux, ans);
-            }
+            else printStacksPlus(stacks, ans);
         }
 
-        StdOut.printf("LIS: %d elements\n", ans);
-    
+        StdOut.printf("LIS: %d elements\n", ans); 
     }
 }
