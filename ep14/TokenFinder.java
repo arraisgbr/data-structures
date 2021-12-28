@@ -48,8 +48,11 @@ public class TokenFinder{
 
     void eliminaAspas(){
         for(int i = 0 ; i < this.quantidadeTokens ; i++){
-            if(this.tokens[i].charAt(0) == '"') this.tokens[i].deleteCharAt(0);
-            if(this.tokens[i].charAt(this.tokens[i].length() - 1) == '"') this.tokens[i].deleteCharAt(this.tokens[i].length() - 1);
+            if(this.tokens[i].length() == 0) continue;
+            char ini = this.tokens[i].charAt(0);
+            char fim = this.tokens[i].charAt(this.tokens[i].length() - 1);
+            if(ini == '"' || ini == ' ') this.tokens[i].deleteCharAt(0);
+            if(fim == '"' || fim == ' ') this.tokens[i].deleteCharAt(this.tokens[i].length() - 1);
             int j = 1;
             while(j < this.tokens[i].length() - 1){
                 if(this.tokens[i].charAt(j) == '"'){
@@ -67,4 +70,8 @@ public class TokenFinder{
         return retorno;
     }
 
+    String tokenAt(int indice){
+        if(indice >= this.quantidadeTokens) return null;
+        else return this.tokens[indice].toString();
+    }
 }
